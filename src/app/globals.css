@@ -1,26 +1,143 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* Elivapp Custom Dark Theme */
+  --background: #00152B;
+  --foreground: #FFFFFF;
+  --card: #042850;
+  --card-foreground: #FFFFFF;
+  --popover: #042850;
+  --popover-foreground: #FFFFFF;
+  --primary: #D7FE7C;
+  --primary-foreground: #00152B;
+  --secondary: #0A355C;
+  --secondary-foreground: #FFFFFF;
+  --muted: #0A355C;
+  --muted-foreground: #94A3B8;
+  --accent: #D7FE7C;
+  --accent-foreground: #00152B;
+  --destructive: #FF4D4D;
+  --border: #0A355C;
+  --input: #0A355C;
+  --ring: #D7FE7C;
+  
+  --chart-1: #D7FE7C;
+  --chart-2: #FF4D4D;
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  
+  --sidebar: #001F3E;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #D7FE7C;
+  --sidebar-primary-foreground: #00152B;
+  --sidebar-accent: #042850;
+  --sidebar-accent-foreground: #D7FE7C;
+  --sidebar-border: #0A355C;
+  --sidebar-ring: #D7FE7C;
+}
+
+/* Force everything to match dark theme regardless of class */
+.dark {
+  --background: #00152B;
+  --foreground: #FFFFFF;
+  --card: #042850;
+  --card-foreground: #FFFFFF;
+  --popover: #042850;
+  --popover-foreground: #FFFFFF;
+  --primary: #D7FE7C;
+  --primary-foreground: #00152B;
+  --secondary: #0A355C;
+  --secondary-foreground: #FFFFFF;
+  --muted: #0A355C;
+  --muted-foreground: #94A3B8;
+  --accent: #D7FE7C;
+  --accent-foreground: #00152B;
+  --destructive: #FF4D4D;
+  --border: #0A355C;
+  --input: #0A355C;
+  --ring: #D7FE7C;
+  
+  --chart-1: #D7FE7C;
+  --chart-2: #FF4D4D;
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  
+  --sidebar: #001F3E;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #D7FE7C;
+  --sidebar-primary-foreground: #00152B;
+  --sidebar-accent: #042850;
+  --sidebar-accent-foreground: #D7FE7C;
+  --sidebar-border: #0A355C;
+  --sidebar-ring: #D7FE7C;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+    color-scheme: dark;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Global utility for lime green text */
+.text-brand {
+  color: #D7FE7C;
 }
