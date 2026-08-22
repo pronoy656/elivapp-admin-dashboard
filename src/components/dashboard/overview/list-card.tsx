@@ -18,26 +18,28 @@ interface ListCardProps {
 
 export function ListCard({ title, items, FallbackIcon }: ListCardProps) {
   return (
-    <Card className="bg-[#042850] border-[#0A355C]">
-      <CardHeader className="flex flex-row items-center justify-between pb-4 mb-4 border-b border-[#D7FE7C]/60">
-        <CardTitle className="text-sm font-medium text-white">{title}</CardTitle>
-        <Button variant="link" className="text-xs text-[#D7FE7C] h-auto p-0">View all</Button>
+    <Card className="bg-[#042850] border-[#0A355C] rounded-2xl overflow-hidden p-0">
+      <CardHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-[#0A355C]/80 space-y-0">
+        <CardTitle className="text-sm font-semibold text-white tracking-wide">{title}</CardTitle>
+        <Button variant="link" className="text-xs text-[#94A3B8] hover:text-white font-medium h-auto p-0 no-underline">
+          View all
+        </Button>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+      <CardContent className="px-6 py-2 flex flex-col divide-y divide-[#0A355C]/60">
         {items.map((item, i) => (
-          <div key={i} className="flex items-center gap-3 border-b border-[#D7FE7C]/60 pb-4 h-16 last:border-0 last:pb-0">
-            <span className="text-xs text-muted-foreground font-semibold w-4 text-center">{i + 1}</span>
-            <Avatar className="h-10 w-10 border border-[#0A355C]">
+          <div key={i} className="flex items-center gap-3.5 py-3.5 first:pt-2 last:pb-2">
+            <span className="text-xs text-[#64748B] font-medium w-3 text-center">{i + 1}</span>
+            <Avatar className="h-9 w-9 rounded-full border border-[#0A355C]/80">
               {item.img && <AvatarImage src={item.img} alt={item.name} />}
               <AvatarFallback className="bg-[#00152B] text-xs text-white">
-                <FallbackIcon className="h-4 w-4 text-[#D7FE7C]" />
+                <FallbackIcon className="h-4 w-4 text-[#C7F556]" />
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-white">{item.name}</span>
-              <span className="text-[10px] text-muted-foreground">{item.desc}</span>
+              <span className="text-sm font-semibold text-white leading-tight">{item.name}</span>
+              <span className="text-[11px] text-[#64748B] font-normal mt-0.5">{item.desc}</span>
             </div>
-            <div className="ml-auto text-sm font-bold text-[#D7FE7C]">{item.val}</div>
+            <div className="ml-auto text-sm font-bold text-[#C7F556] tracking-tight">{item.val}</div>
           </div>
         ))}
       </CardContent>
