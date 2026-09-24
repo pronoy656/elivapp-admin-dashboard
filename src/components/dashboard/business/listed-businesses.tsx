@@ -9,6 +9,7 @@ import { DataTable, ColumnDef } from "@/components/common/data-table"
 import { Search } from "lucide-react"
 import { ConfirmModal } from "@/components/common/confirm-modal"
 import { EditBusinessModal, EditBusinessData } from "@/components/common/edit-business-modal"
+import { BusinessCampaignsModal } from "./business-campaigns-modal"
 
 type Status = "ACTIVE" | "SUSPENDED"
 
@@ -41,6 +42,9 @@ export function ListedBusinesses() {
   const [data, setData] = useState<BusinessData[]>(initialData)
   const [activeTab, setActiveTab] = useState<"All" | "Active" | "Suspended">("All")
   const [searchTerm, setSearchTerm] = useState<string>("")
+
+  // Campaigns Modal state
+  const [selectedBusiness, setSelectedBusiness] = useState<{name: string, id: string} | null>(null)
 
   // Edit Modal state
   const [editingBusiness, setEditingBusiness] = useState<BusinessData | null>(null)
@@ -236,9 +240,20 @@ export function ListedBusinesses() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <DataTable columns={columns} data={filteredData} />
+          <DataTable 
+            columns={columns} 
+            data={filteredData} 
+            onRowClick={(row) => setSelectedBusiness({ name: row.name, id: row.id })}
+          />
         </CardContent>
       </Card>
+
+      {/* Campaigns Modal */}
+      <BusinessCampaignsModal
+        isOpen={!!selectedBusiness}
+        onClose={() => setSelectedBusiness(null)}
+        business={selectedBusiness}
+      />
 
       {/* Edit Business Modal */}
       <EditBusinessModal

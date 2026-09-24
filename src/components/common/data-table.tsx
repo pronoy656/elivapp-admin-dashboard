@@ -15,6 +15,7 @@ interface DataTableProps<T> {
   data: T[]
   className?: string
   pageSize?: number
+  onRowClick?: (row: T) => void
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -22,6 +23,7 @@ export function DataTable<T extends Record<string, any>>({
   data,
   className,
   pageSize = 10,
+  onRowClick,
 }: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = React.useState(1)
 
@@ -66,7 +68,11 @@ export function DataTable<T extends Record<string, any>>({
               paginatedData.map((row, rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className="border-b border-[#0A355C] transition-colors hover:bg-[#00152B]/50 data-[state=selected]:bg-[#00152B] last:border-0"
+                  onClick={() => onRowClick && onRowClick(row)}
+                  className={cn(
+                    "border-b border-[#0A355C] transition-colors hover:bg-[#00152B]/50 data-[state=selected]:bg-[#00152B] last:border-0",
+                    onRowClick && "cursor-pointer"
+                  )}
                 >
                   {columns.map((col) => (
                     <td key={col.key} className={cn("p-4 align-middle", col.className)}>

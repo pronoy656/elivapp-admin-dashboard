@@ -67,6 +67,7 @@ export default function DashboardLayout({
               <SidebarMenu className="gap-2.5">
                 {[
                   { name: "Dashboard", href: "/dashboard", icon: LayoutGrid },
+                  { name: "Users", href: "/dashboard/users", icon: User },
                   { name: "Referrals", href: "/dashboard/referrals", icon: QrCode },
                   { name: "Businesses", href: "/dashboard/businesses", icon: Building2, count: 2 },
                   { name: "Promoters", href: "/dashboard/promoters", icon: Users, count: 2 },
