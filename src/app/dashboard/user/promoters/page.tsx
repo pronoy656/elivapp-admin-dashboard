@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
 
-export default function PromotersPage() {
+export default function UserPromotersPage() {
   redirect("/dashboard/users/promoters")
 }

@@ -41,6 +41,9 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuBadge,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
 } from "@/components/ui/sidebar"
 
 export default function DashboardLayout({
@@ -51,6 +54,61 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const [headerRange, setHeaderRange] = useState<"7D" | "30D" | "90D">("30D")
   const [unreadNotifications, setUnreadNotifications] = useState(2)
+  const [usersExpanded, setUsersExpanded] = useState(true)
+
+  const isUsersActive =
+    pathname.startsWith("/dashboard/users") ||
+    pathname.startsWith("/dashboard/user") ||
+    pathname.startsWith("/dashboard/businesses") ||
+    pathname.startsWith("/dashboard/promoters")
+
+  const getHeaderTitle = () => {
+    if (pathname === "/dashboard") return "Dashboard"
+    if (pathname.includes("/users/business") || pathname.includes("/businesses")) return "Users / Business"
+    if (pathname.includes("/users/promoters") || pathname.includes("/promoters")) return "Users / Promoters"
+    if (pathname.startsWith("/dashboard/users") || pathname.startsWith("/dashboard/user")) return "Users"
+    if (pathname.startsWith("/dashboard/referrals")) return "Referrals"
+    if (pathname.startsWith("/dashboard/notifications")) return "Notifications"
+    if (pathname.startsWith("/dashboard/settings")) return "Settings"
+    if (pathname.startsWith("/dashboard/my-profile")) return "My Profile"
+    return "Dashboard"
+  }
+
+  const navItems = [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutGrid },
+    {
+      name: "Users",
+      href: "/dashboard/users/business",
+      icon: User,
+      isCollapsible: true,
+      subItems: [
+        {
+          name: "Business",
+          href: "/dashboard/users/business",
+          icon: Building2,
+          count: 2,
+          isActive:
+            pathname.startsWith("/dashboard/users/business") ||
+            pathname.startsWith("/dashboard/users/businesses") ||
+            pathname.startsWith("/dashboard/user/business") ||
+            pathname === "/dashboard/businesses",
+        },
+        {
+          name: "Promoters",
+          href: "/dashboard/users/promoters",
+          icon: Users,
+          count: 2,
+          isActive:
+            pathname.startsWith("/dashboard/users/promoters") ||
+            pathname.startsWith("/dashboard/user/promoters") ||
+            pathname === "/dashboard/promoters",
+        },
+      ],
+    },
+    { name: "Referrals", href: "/dashboard/referrals", icon: QrCode },
+    { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
+    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  ]
 
   return (
     <SidebarProvider>
@@ -65,16 +123,100 @@ export default function DashboardLayout({
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu className="gap-2.5">
-                {[
-                  { name: "Dashboard", href: "/dashboard", icon: LayoutGrid },
-                  { name: "Users", href: "/dashboard/users", icon: User },
-                  { name: "Referrals", href: "/dashboard/referrals", icon: QrCode },
-                  { name: "Businesses", href: "/dashboard/businesses", icon: Building2, count: 2 },
-                  { name: "Promoters", href: "/dashboard/promoters", icon: Users, count: 2 },
-                  { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
-                  { name: "Settings", href: "/dashboard/settings", icon: Settings },
-                ].map((item) => {
-                  const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
+                {navItems.map((item) => {
+                  if (item.isCollapsible && item.subItems) {
+                    return (
+                      <SidebarMenuItem key={item.name} className="flex flex-col gap-1.5">
+                        <SidebarMenuButton
+                          render={<Link href={item.href} />}
+                          isActive={isUsersActive}
+                          className={`relative rounded-2xl transition-all h-13 px-4 group cursor-pointer ${
+                            isUsersActive
+                              ? "bg-[#C7F55624]/60 text-white"
+                              : "text-white bg-transparent hover:bg-white/5"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3.5 h-full w-full relative">
+                            {React.createElement(item.icon, {
+                              className: `h-5 w-5 ${
+                                isUsersActive ? "text-[#C7F556]" : "text-white"
+                              }`,
+                            })}
+                            <span className="text-base tracking-wide text-white font-medium">
+                              {item.name}
+                            </span>
+
+                            <span
+                              role="button"
+                              tabIndex={0}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                setUsersExpanded((prev) => !prev)
+                              }}
+                              className="ml-auto p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                            >
+                              <ChevronDown
+                                className={`h-4 w-4 transition-transform duration-200 ${
+                                  usersExpanded ? "rotate-180 text-[#C7F556]" : "text-white/70"
+                                }`}
+                              />
+                            </span>
+
+                            {isUsersActive && (
+                              <div className="ml-1 w-1.5 h-6 bg-[#C7F556] rounded-full shadow-[0_0_8px_rgba(199,245,86,0.5)]" />
+                            )}
+                          </div>
+                        </SidebarMenuButton>
+
+                        {usersExpanded && (
+                          <SidebarMenuSub className="ml-4 pl-3.5 border-l border-[#0A355C] flex flex-col gap-1.5 py-1">
+                            {item.subItems.map((subItem) => {
+                              const SubIcon = subItem.icon
+
+                              return (
+                                <SidebarMenuSubItem key={subItem.name}>
+                                  <SidebarMenuSubButton
+                                    render={<Link href={subItem.href} />}
+                                    isActive={subItem.isActive}
+                                    className={`rounded-xl px-3 py-2.5 h-10 transition-all flex items-center justify-between cursor-pointer ${
+                                      subItem.isActive
+                                        ? "bg-[#C7F556]/15 text-[#C7F556] font-medium"
+                                        : "text-white/75 hover:text-white hover:bg-white/5"
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2.5">
+                                      <SubIcon
+                                        className={`h-4 w-4 ${
+                                          subItem.isActive ? "text-[#C7F556]" : "text-white/70"
+                                        }`}
+                                      />
+                                      <span className="text-sm">{subItem.name}</span>
+                                    </div>
+                                    {subItem.count !== undefined && (
+                                      <span
+                                        className={`h-5 w-5 rounded-full flex items-center justify-center text-[11px] font-bold border ${
+                                          subItem.isActive
+                                            ? "bg-[#18393D] text-[#C7F556] border-[#234C51]"
+                                            : "bg-[#0A355C] text-white/70 border-[#0A355C]"
+                                        }`}
+                                      >
+                                        {subItem.count}
+                                      </span>
+                                    )}
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              )
+                            })}
+                          </SidebarMenuSub>
+                        )}
+                      </SidebarMenuItem>
+                    )
+                  }
+
+                  const isActive =
+                    pathname === item.href ||
+                    (item.href !== "/dashboard" && pathname.startsWith(item.href))
                   const Icon = item.icon
 
                   return (
@@ -85,26 +227,21 @@ export default function DashboardLayout({
                         className={`relative rounded-2xl transition-all h-13 px-4 group ${
                           isActive
                             ? "bg-[#C7F55624]/60 text-white"
-                            : "text-white bg-transparent"
+                            : "text-white bg-transparent hover:bg-white/5"
                         }`}
                       >
                         <div className="flex items-center gap-3.5 h-full w-full relative">
                           <Icon
-                            className={`h-5 w-5  ${isActive ? "text-[#C7F556]" : "text-white"
-                              }`}
+                            className={`h-5 w-5 ${
+                              isActive ? "text-[#C7F556]" : "text-white"
+                            }`}
                           />
                           <span className="text-base tracking-wide text-white font-medium">
                             {item.name}
                           </span>
 
-                          {item.count !== undefined && (
-                            <span className="ml-auto bg-[#18393D] text-[#C7F556] h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold border border-[#234C51]">
-                              {item.count}
-                            </span>
-                          )}
-
                           {isActive && (
-                            <div className={`${item.count !== undefined ? 'ml-2' : 'ml-auto'} w-1.5 h-6 bg-[#C7F556] rounded-full shadow-[0_0_8px_rgba(199,245,86,0.5)]`} />
+                            <div className="ml-auto w-1.5 h-6 bg-[#C7F556] rounded-full shadow-[0_0_8px_rgba(199,245,86,0.5)]" />
                           )}
                         </div>
                       </SidebarMenuButton>
@@ -141,7 +278,9 @@ export default function DashboardLayout({
         <header className="flex h-20 items-center gap-4 px-8 pt-4 bg-[#001F3E]">
           <div className="flex items-center gap-4 flex-1">
             <SidebarTrigger className="-ml-2 text-muted-foreground hover:text-white" />
-            <h1 className="text-2xl font-semibold tracking-tight text-white hidden md:block">Dashboard</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-white hidden md:block">
+              {getHeaderTitle()}
+            </h1>
           </div>
           <div className="flex items-center gap-4 md:gap-6 ml-auto">
             <form className="hidden md:block">
