@@ -4,143 +4,130 @@ import { useState } from "react"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DataTable, ColumnDef } from "@/components/common/data-table"
-import { Search, MoreVertical, Eye, Pencil, Trash2, CheckCircle2, Plus, ArrowUpRight, Tag, XCircle } from "lucide-react"
+import { Search, MoreVertical, Eye, Pencil, CheckCircle2, XCircle } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { ViewLeadModal, LeadData, LeadStatus } from "./view-lead-modal"
+import { ViewLeadModal, LeadData, LeadStatus, statusBadgeStyles } from "./view-lead-modal"
 import { EditLeadModal } from "./edit-lead-modal"
-import { AddLeadModal } from "./add-lead-modal"
+import { RejectLeadModal } from "./reject-lead-modal"
 
 const initialLeads: LeadData[] = [
   {
     id: "1",
-    name: "Marcus Sterling",
-    email: "marcus.s@outlook.com",
+    businessName: "FitZone Gym",
+    ownerName: "Devon Rivera",
+    ownerEmail: "devon@fitzone.com",
     phone: "+1 555-0143",
-    company: "FitZone Gym",
-    promoter: "Devon Rivera",
-    source: "Instagram QR",
-    value: "$450",
-    status: "QUALIFIED",
-    date: "2h ago",
-    img: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=faces",
+    address: "120 Market St, Austin, TX",
+    status: "APPROVED",
+    adminNote: "Initial verification call completed and verified.",
+    createdAt: "Oct 02, 2026",
   },
   {
     id: "2",
-    name: "Elena Rostova",
-    email: "elena.r@gmail.com",
+    businessName: "TacoFusion",
+    ownerName: "Marco Silva",
+    ownerEmail: "marco@tacofusion.com",
     phone: "+1 555-0182",
-    company: "Luna Spa",
-    promoter: "Alicia Monroe",
-    source: "Referral Link",
-    value: "$320",
-    status: "CONVERTED",
-    date: "5h ago",
-    img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=faces",
+    address: "450 Broadway Ave, New York, NY",
+    status: "IN_PROGRESS",
+    adminNote: "Requested business tax identification documents.",
+    createdAt: "Oct 04, 2026",
   },
   {
     id: "3",
-    name: "David Chen",
-    email: "dchen@techcorp.io",
+    businessName: "Luna Spa & Wellness",
+    ownerName: "Alicia Monroe",
+    ownerEmail: "alicia@lunaspa.com",
     phone: "+1 555-0199",
-    company: "TacoFusion",
-    promoter: "Jordan Travis",
-    source: "TikTok Video",
-    value: "$180",
-    status: "NEW",
-    date: "Today",
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces",
+    address: "88 Sunset Blvd, Los Angeles, CA",
+    status: "APPROVED",
+    adminNote: "Signed 12-month promoter partnership agreement.",
+    createdAt: "Oct 03, 2026",
   },
   {
     id: "4",
-    name: "Sarah Jenkins",
-    email: "sarah.j@brandpulse.co",
+    businessName: "Kava Brew Café",
+    ownerName: "Tariq Osman",
+    ownerEmail: "tariq@kavabrew.com",
     phone: "+1 555-0211",
-    company: "Kava Brew",
-    promoter: "Mia Torres",
-    source: "Flyer Promo",
-    value: "$240",
-    status: "CONTACTED",
-    date: "Yesterday",
-    img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=faces",
+    address: "304 Pine St, Seattle, WA",
+    status: "PENDING",
+    adminNote: "Awaiting owner response via email regarding menu rewards.",
+    createdAt: "Oct 06, 2026",
   },
   {
     id: "5",
-    name: "Carlos Mendez",
-    email: "carlos.m@yahoo.com",
+    businessName: "CloudCuts Salon",
+    ownerName: "Sarah Connor",
+    ownerEmail: "sarah@cloudcuts.com",
     phone: "+1 555-0234",
-    company: "FitZone Gym",
-    promoter: "Devon Rivera",
-    source: "Referral Link",
-    value: "$600",
-    status: "CONVERTED",
-    date: "Yesterday",
-    img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces",
+    address: "12 Ocean Dr, Miami, FL",
+    status: "REJECTED",
+    adminNote: "Incomplete registration info submitted.",
+    rejectReason: "Unverifiable business registration license.",
+    createdAt: "Sep 28, 2026",
   },
   {
     id: "6",
-    name: "Hannah Abbott",
-    email: "hannah@creativehub.com",
+    businessName: "Apex Auto Care",
+    ownerName: "James Wright",
+    ownerEmail: "james@apexauto.com",
     phone: "+1 555-0255",
-    company: "CloudCuts",
-    promoter: "Sakura Ito",
-    source: "Direct Invite",
-    value: "$120",
-    status: "LOST",
-    date: "2d ago",
-    img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=faces",
+    address: "98 Industrial Pkwy, Chicago, IL",
+    status: "PENDING",
+    adminNote: "New inbound lead from website form.",
+    createdAt: "Oct 07, 2026",
   },
   {
     id: "7",
-    name: "Zack Peterson",
-    email: "zack.p@apexfit.com",
+    businessName: "Green Thumb Nursery",
+    ownerName: "Elena Rostova",
+    ownerEmail: "elena@greenthumb.org",
     phone: "+1 555-0278",
-    company: "FitZone Gym",
-    promoter: "Alicia Monroe",
-    source: "Event Booth",
-    value: "$520",
-    status: "QUALIFIED",
-    date: "3d ago",
-    img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop&crop=faces",
+    address: "15 Garden Ln, Portland, OR",
+    status: "IN_PROGRESS",
+    adminNote: "Scheduled onboarding call for tomorrow morning.",
+    createdAt: "Oct 05, 2026",
   },
   {
     id: "8",
-    name: "Amara Nwosu",
-    email: "amara@globaltech.ng",
+    businessName: "Burger Barn Express",
+    ownerName: "Zack Peterson",
+    ownerEmail: "zack@burgerbarn.com",
     phone: "+1 555-0291",
-    company: "Luna Spa",
-    promoter: "Kwame Asante",
-    source: "Referral Link",
-    value: "$380",
-    status: "CONTACTED",
-    date: "3d ago",
-    img: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&h=100&fit=crop&crop=faces",
+    address: "77 Main St, Dallas, TX",
+    status: "REJECTED",
+    adminNote: "Owner declined proposal during follow-up.",
+    rejectReason: "Owner opted for direct competitor software.",
+    createdAt: "Sep 30, 2026",
   },
 ]
 
-const statusStyles: Record<LeadStatus, { bg: string; text: string }> = {
-  NEW: { bg: "bg-[#38BDF8]/15", text: "text-[#38BDF8]" },
-  CONTACTED: { bg: "bg-[#FBBF24]/15", text: "text-[#FBBF24]" },
-  QUALIFIED: { bg: "bg-[#C7F556]/15", text: "text-[#C7F556]" },
-  CONVERTED: { bg: "bg-[#34D399]/15", text: "text-[#34D399]" },
-  LOST: { bg: "bg-[#F87171]/15", text: "text-[#F87171]" },
+type TabFilter = "All" | "Pending" | "In Progress" | "Approved" | "Rejected"
+
+const tabToStatusMap: Record<TabFilter, LeadStatus | "ALL"> = {
+  All: "ALL",
+  Pending: "PENDING",
+  "In Progress": "IN_PROGRESS",
+  Approved: "APPROVED",
+  Rejected: "REJECTED",
 }
 
 export function LeadsTable() {
   const [data, setData] = useState<LeadData[]>(initialLeads)
-  const [activeTab, setActiveTab] = useState<"All" | LeadStatus>("All")
+  const [activeTab, setActiveTab] = useState<TabFilter>("All")
   const [searchTerm, setSearchTerm] = useState<string>("")
 
   // Modals state
   const [viewingLead, setViewingLead] = useState<LeadData | null>(null)
   const [editingLead, setEditingLead] = useState<LeadData | null>(null)
-  const [isAddOpen, setIsAddOpen] = useState(false)
+  const [rejectingLead, setRejectingLead] = useState<LeadData | null>(null)
 
   const handleSaveEdit = (updated: LeadData) => {
     setData((prev) => prev.map((item) => (item.id === updated.id ? updated : item)))
@@ -150,100 +137,120 @@ export function LeadsTable() {
     setEditingLead(null)
   }
 
-  const handleAddLead = (newLead: LeadData) => {
-    setData((prev) => [newLead, ...prev])
-  }
-
-  const handleUpdateStatus = (id: string, newStatus: LeadStatus) => {
+  const handleApprove = (id: string) => {
     setData((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item))
+      prev.map((item) =>
+        item.id === id ? { ...item, status: "APPROVED", rejectReason: undefined } : item
+      )
     )
+    if (viewingLead && viewingLead.id === id) {
+      setViewingLead((prev) => (prev ? { ...prev, status: "APPROVED", rejectReason: undefined } : null))
+    }
   }
 
-  const handleDeleteLead = (id: string) => {
-    setData((prev) => prev.filter((item) => item.id !== id))
+  const handleConfirmReject = (id: string, reason: string) => {
+    setData((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, status: "REJECTED", rejectReason: reason } : item
+      )
+    )
     if (viewingLead && viewingLead.id === id) {
-      setViewingLead(null)
+      setViewingLead((prev) => (prev ? { ...prev, status: "REJECTED", rejectReason: reason } : null))
     }
   }
 
   const filteredData = data.filter((d) => {
-    const matchesTab = activeTab === "All" || d.status === activeTab
+    const requiredStatus = tabToStatusMap[activeTab]
+    const matchesTab = requiredStatus === "ALL" || d.status === requiredStatus
+    const term = searchTerm.toLowerCase()
     const matchesSearch =
-      d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      d.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      d.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      d.promoter.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      d.source.toLowerCase().includes(searchTerm.toLowerCase())
+      d.businessName.toLowerCase().includes(term) ||
+      d.ownerName.toLowerCase().includes(term) ||
+      d.ownerEmail.toLowerCase().includes(term) ||
+      d.phone.toLowerCase().includes(term) ||
+      d.address.toLowerCase().includes(term) ||
+      (d.adminNote && d.adminNote.toLowerCase().includes(term))
     return matchesTab && matchesSearch
   })
 
   const columns: ColumnDef<LeadData>[] = [
     {
-      key: "name",
-      header: "LEAD",
+      key: "businessName",
+      header: "BUSINESS NAME",
       render: (row) => (
-        <div className="flex items-center gap-3">
-          <Avatar className="h-8 w-8 border border-[#0A355C]">
-            {row.img ? <AvatarImage src={row.img} alt={row.name} /> : null}
-            <AvatarFallback>{row.name[0]}</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <span className="text-white text-xs font-semibold">{row.name}</span>
-            <span className="text-[#94A3B8] text-[11px] truncate max-w-[140px]">{row.email}</span>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "company",
-      header: "BUSINESS",
-      render: (row) => (
-        <span className="text-white text-xs font-medium">{row.company}</span>
-      ),
-    },
-    {
-      key: "promoter",
-      header: "PROMOTER",
-      render: (row) => (
-        <span className="text-[#CBD5E1] text-xs">{row.promoter}</span>
-      ),
-    },
-    {
-      key: "source",
-      header: "SOURCE",
-      render: (row) => (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-[#0A355C]/60 text-[#CBD5E1] border border-[#0A355C]">
-          <Tag className="h-2.5 w-2.5 text-[#F59E0B]" />
-          {row.source}
+        <span className="font-semibold text-white text-xs whitespace-nowrap">
+          {row.businessName}
         </span>
       ),
     },
     {
-      key: "value",
-      header: "EST. VALUE",
+      key: "ownerName",
+      header: "OWNER NAME",
       render: (row) => (
-        <span className="text-[#C7F556] text-xs font-bold">{row.value}</span>
+        <span className="text-[#CBD5E1] text-xs font-medium whitespace-nowrap">
+          {row.ownerName}
+        </span>
+      ),
+    },
+    {
+      key: "ownerEmail",
+      header: "OWNER EMAIL",
+      render: (row) => (
+        <span className="text-[#94A3B8] text-xs font-mono">{row.ownerEmail}</span>
+      ),
+    },
+    {
+      key: "phone",
+      header: "PHONE",
+      render: (row) => (
+        <span className="text-[#CBD5E1] text-xs font-mono whitespace-nowrap">{row.phone}</span>
+      ),
+    },
+    {
+      key: "address",
+      header: "ADDRESS",
+      render: (row) => (
+        <span className="text-[#94A3B8] text-xs max-w-[200px] truncate block" title={row.address}>
+          {row.address}
+        </span>
       ),
     },
     {
       key: "status",
-      header: "STAGE",
+      header: "STATUS",
       render: (row) => {
-        const style = statusStyles[row.status] || { bg: "bg-white/10", text: "text-white" }
+        const badge = statusBadgeStyles[row.status] || {
+          label: row.status,
+          bg: "bg-white/10",
+          text: "text-white",
+        }
         return (
           <div
-            className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase ${style.bg} ${style.text}`}
+            className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase whitespace-nowrap ${badge.bg} ${badge.text}`}
           >
-            {row.status}
+            {badge.label}
           </div>
         )
       },
     },
     {
-      key: "date",
-      header: "ACQUIRED",
-      render: (row) => <span className="text-[#94A3B8] text-xs">{row.date}</span>,
+      key: "adminNote",
+      header: "ADMIN NOTE",
+      render: (row) => (
+        <span
+          className="text-[#CBD5E1] text-xs max-w-[180px] truncate block italic"
+          title={row.adminNote}
+        >
+          {row.adminNote || "—"}
+        </span>
+      ),
+    },
+    {
+      key: "createdAt",
+      header: "CREATED AT",
+      render: (row) => (
+        <span className="text-[#94A3B8] text-xs whitespace-nowrap font-mono">{row.createdAt}</span>
+      ),
     },
     {
       key: "actions",
@@ -268,6 +275,7 @@ export function LeadsTable() {
                   <Eye className="h-3.5 w-3.5 text-[#C7F556]" />
                   <span>View Details</span>
                 </DropdownMenuItem>
+
                 <DropdownMenuItem
                   onClick={() => setEditingLead(row)}
                   className="flex items-center gap-2 px-3 py-2 text-xs text-[#CBD5E1] hover:text-white hover:bg-[#0A355C] rounded-lg cursor-pointer outline-none transition-colors"
@@ -276,33 +284,25 @@ export function LeadsTable() {
                   <span>Edit Lead</span>
                 </DropdownMenuItem>
 
-                {row.status !== "CONVERTED" && (
+                {row.status !== "APPROVED" && (
                   <DropdownMenuItem
-                    onClick={() => handleUpdateStatus(row.id, "CONVERTED")}
+                    onClick={() => handleApprove(row.id)}
                     className="flex items-center gap-2 px-3 py-2 text-xs text-[#34D399] hover:bg-[#34D399]/15 rounded-lg cursor-pointer outline-none transition-colors"
                   >
                     <CheckCircle2 className="h-3.5 w-3.5 text-[#34D399]" />
-                    <span>Mark Converted</span>
+                    <span>Approve</span>
                   </DropdownMenuItem>
                 )}
 
-                {row.status !== "LOST" && (
+                {row.status !== "REJECTED" && (
                   <DropdownMenuItem
-                    onClick={() => handleUpdateStatus(row.id, "LOST")}
+                    onClick={() => setRejectingLead(row)}
                     className="flex items-center gap-2 px-3 py-2 text-xs text-[#F87171] hover:bg-[#F87171]/15 rounded-lg cursor-pointer outline-none transition-colors"
                   >
                     <XCircle className="h-3.5 w-3.5 text-[#F87171]" />
-                    <span>Mark Lost</span>
+                    <span>Reject</span>
                   </DropdownMenuItem>
                 )}
-
-                <DropdownMenuItem
-                  onClick={() => handleDeleteLead(row.id)}
-                  className="flex items-center gap-2 px-3 py-2 text-xs text-[#F87171] hover:bg-[#F87171]/15 rounded-lg cursor-pointer outline-none transition-colors"
-                >
-                  <Trash2 className="h-3.5 w-3.5 text-[#F87171]" />
-                  <span>Delete</span>
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -311,7 +311,7 @@ export function LeadsTable() {
     },
   ]
 
-  const tabs: ("All" | LeadStatus)[] = ["All", "NEW", "CONTACTED", "QUALIFIED", "CONVERTED", "LOST"]
+  const tabs: TabFilter[] = ["All", "Pending", "In Progress", "Approved", "Rejected"]
 
   return (
     <>
@@ -328,40 +328,32 @@ export function LeadsTable() {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search lead, email, business, or source..."
+                placeholder="Search business, owner, phone, email..."
                 className="h-9 w-full pl-9 bg-[#00152B] border-[#0A355C] text-white text-xs placeholder:text-[#94A3B8] rounded-xl focus-visible:ring-1 focus-visible:ring-[#C7F556]"
               />
             </div>
           </div>
 
-          {/* Right side: Tabs filter and Add Lead Button */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 self-start md:self-end">
-            <div className="flex items-center gap-1 bg-[#00152B] p-1 rounded-xl border border-[#0A355C] overflow-x-auto max-w-full">
-              {tabs.map((tab) => {
-                const isActive = activeTab === tab
-                return (
-                  <Button
-                    key={tab}
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setActiveTab(tab)}
-                    className={`h-7 px-3 text-[11px] font-medium rounded-lg transition-colors cursor-pointer capitalize ${
-                      isActive ? "bg-[#0A355C] text-white shadow-sm" : "text-[#94A3B8] hover:text-white hover:bg-[#0A355C]/50"
-                    }`}
-                  >
-                    {tab.toLowerCase()}
-                  </Button>
-                )
-              })}
-            </div>
-
-            <Button
-              onClick={() => setIsAddOpen(true)}
-              className="h-9 px-4 text-xs font-semibold bg-[#C7F556] hover:bg-[#b8e645] text-[#00152B] rounded-xl flex items-center gap-1.5 cursor-pointer shadow-md shadow-[#C7F556]/15"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Add Lead</span>
-            </Button>
+          {/* Right side: Tabs filter (Pending, In Progress, Approved, Rejected) */}
+          <div className="flex items-center gap-1 bg-[#00152B] p-1 rounded-xl border border-[#0A355C] overflow-x-auto self-start md:self-end">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab
+              return (
+                <Button
+                  key={tab}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setActiveTab(tab)}
+                  className={`h-7 px-3.5 text-[11px] font-medium rounded-lg transition-colors cursor-pointer ${
+                    isActive
+                      ? "bg-[#0A355C] text-white shadow-sm font-semibold"
+                      : "text-[#94A3B8] hover:text-white hover:bg-[#0A355C]/50"
+                  }`}
+                >
+                  {tab}
+                </Button>
+              )
+            })}
           </div>
         </CardHeader>
 
@@ -374,12 +366,14 @@ export function LeadsTable() {
         </CardContent>
       </Card>
 
-      {/* View Lead Modal */}
+      {/* View Lead Details Modal */}
       <ViewLeadModal
         isOpen={!!viewingLead}
         onClose={() => setViewingLead(null)}
         lead={viewingLead}
         onEdit={(lead) => setEditingLead(lead)}
+        onApprove={handleApprove}
+        onReject={(lead) => setRejectingLead(lead)}
       />
 
       {/* Edit Lead Modal */}
@@ -390,11 +384,12 @@ export function LeadsTable() {
         lead={editingLead}
       />
 
-      {/* Add Lead Modal */}
-      <AddLeadModal
-        isOpen={isAddOpen}
-        onClose={() => setIsAddOpen(false)}
-        onAdd={handleAddLead}
+      {/* Reject Lead Modal */}
+      <RejectLeadModal
+        isOpen={!!rejectingLead}
+        onClose={() => setRejectingLead(null)}
+        onConfirm={handleConfirmReject}
+        lead={rejectingLead ? { id: rejectingLead.id, businessName: rejectingLead.businessName } : null}
       />
     </>
   )

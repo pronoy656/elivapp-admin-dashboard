@@ -1,24 +1,22 @@
 "use client"
 
 import React from "react"
-import { X, User, Mail, Phone, Building2, DollarSign, Calendar, Tag, UserCheck, ArrowUpRight } from "lucide-react"
+import { X, Building2, User, Mail, Phone, MapPin, Calendar, FileText, AlertCircle, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-export type LeadStatus = "NEW" | "CONTACTED" | "QUALIFIED" | "CONVERTED" | "LOST"
+export type LeadStatus = "PENDING" | "IN_PROGRESS" | "APPROVED" | "REJECTED"
 
 export interface LeadData {
   id: string
-  name: string
-  email: string
+  businessName: string
+  ownerName: string
+  ownerEmail: string
   phone: string
-  company: string
-  promoter: string
-  source: string
-  value: string
+  address: string
   status: LeadStatus
-  date: string
-  img?: string
+  adminNote?: string
+  rejectReason?: string
+  createdAt: string
 }
 
 interface ViewLeadModalProps {
@@ -26,14 +24,15 @@ interface ViewLeadModalProps {
   onClose: () => void
   lead: LeadData | null
   onEdit?: (lead: LeadData) => void
+  onApprove?: (id: string) => void
+  onReject?: (lead: LeadData) => void
 }
 
-const statusBadgeStyles: Record<LeadStatus, { bg: string; text: string }> = {
-  NEW: { bg: "bg-[#38BDF8]/15", text: "text-[#38BDF8]" },
-  CONTACTED: { bg: "bg-[#FBBF24]/15", text: "text-[#FBBF24]" },
-  QUALIFIED: { bg: "bg-[#C7F556]/15", text: "#C7F556" },
-  CONVERTED: { bg: "bg-[#34D399]/15", text: "text-[#34D399]" },
-  LOST: { bg: "bg-[#F87171]/15", text: "text-[#F87171]" },
+export const statusBadgeStyles: Record<LeadStatus, { label: string; bg: string; text: string }> = {
+  PENDING: { label: "Pending", bg: "bg-[#FBBF24]/15", text: "text-[#FBBF24]" },
+  IN_PROGRESS: { label: "In Progress", bg: "bg-[#38BDF8]/15", text: "text-[#38BDF8]" },
+  APPROVED: { label: "Approved", bg: "bg-[#34D399]/15", text: "text-[#34D399]" },
+  REJECTED: { label: "Rejected", bg: "bg-[#F87171]/15", text: "text-[#F87171]" },
 }
 
 export function ViewLeadModal({
@@ -41,10 +40,12 @@ export function ViewLeadModal({
   onClose,
   lead,
   onEdit,
+  onApprove,
+  onReject,
 }: ViewLeadModalProps) {
   if (!isOpen || !lead) return null
 
-  const badge = statusBadgeStyles[lead.status] || { bg: "bg-white/10", text: "text-white" }
+  const badge = statusBadgeStyles[lead.status] || { label: lead.status, bg: "bg-white/10", text: "text-white" }
 
   return (
     <div 
@@ -64,104 +65,131 @@ export function ViewLeadModal({
         </button>
 
         {/* Lead Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Avatar className="h-14 w-14 border-2 border-[#C7F556]">
-            {lead.img ? <AvatarImage src={lead.img} alt={lead.name} /> : null}
-            <AvatarFallback className="bg-[#0A355C] text-white font-bold text-lg">
-              {lead.name.slice(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2.5">
-              <h2 className="text-xl font-bold text-white">{lead.name}</h2>
-              <span
-                className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase ${badge.bg} ${badge.text}`}
-              >
-                {lead.status}
-              </span>
-            </div>
-            <p className="text-xs text-[#94A3B8]">{lead.company}</p>
-            <p className="text-xs text-[#64748B] flex items-center gap-1 mt-0.5 font-mono">
-              Lead #{lead.id.padStart(4, "0")} · Acquired {lead.date}
-            </p>
+        <div className="flex flex-col gap-1 mb-6">
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold text-white tracking-tight">{lead.businessName}</h2>
+            <span
+              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase ${badge.bg} ${badge.text}`}
+            >
+              {badge.label}
+            </span>
           </div>
+          <p className="text-xs text-[#94A3B8] flex items-center gap-1.5 mt-0.5">
+            <User className="h-3.5 w-3.5 text-[#C7F556]" />
+            Owner: <span className="text-white font-medium">{lead.ownerName}</span>
+            <span className="text-[#64748B]">·</span>
+            <span className="font-mono text-[#64748B]">Lead #{lead.id.padStart(4, "0")}</span>
+          </p>
         </div>
 
-        {/* Contact Information */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="bg-[#00152B] border border-[#0A355C] rounded-2xl p-3 flex flex-col">
-            <span className="text-[11px] text-[#94A3B8] flex items-center gap-1.5 mb-1">
-              <Mail className="h-3.5 w-3.5 text-[#38BDF8]" />
-              Email
+        {/* Contact & Location Info */}
+        <div className="grid grid-cols-2 gap-3 mb-5">
+          <div className="bg-[#00152B] border border-[#0A355C] rounded-2xl p-3.5 flex flex-col gap-1">
+            <span className="text-[11px] text-[#94A3B8] flex items-center gap-1.5">
+              <Mail className="h-3.5 w-3.5 text-[#38BDF8]" /> Owner Email
             </span>
-            <span className="text-xs font-medium text-white truncate">{lead.email}</span>
+            <span className="text-xs font-medium text-white truncate">{lead.ownerEmail}</span>
           </div>
 
-          <div className="bg-[#00152B] border border-[#0A355C] rounded-2xl p-3 flex flex-col">
-            <span className="text-[11px] text-[#94A3B8] flex items-center gap-1.5 mb-1">
-              <Phone className="h-3.5 w-3.5 text-[#34D399]" />
-              Phone
+          <div className="bg-[#00152B] border border-[#0A355C] rounded-2xl p-3.5 flex flex-col gap-1">
+            <span className="text-[11px] text-[#94A3B8] flex items-center gap-1.5">
+              <Phone className="h-3.5 w-3.5 text-[#34D399]" /> Phone Number
             </span>
             <span className="text-xs font-medium text-white">{lead.phone}</span>
           </div>
         </div>
 
-        {/* Lead Details Card */}
-        <div className="bg-[#00152B] border border-[#0A355C] rounded-2xl p-4 flex flex-col gap-2.5 mb-6 text-xs text-[#CBD5E1]">
-          <div className="flex justify-between items-center py-1 border-b border-[#0A355C]/50">
-            <span className="text-[#94A3B8] flex items-center gap-1.5">
-              <Building2 className="h-3.5 w-3.5 text-[#C7F556]" /> Target Business
+        {/* Address & Meta */}
+        <div className="bg-[#00152B] border border-[#0A355C] rounded-2xl p-4 flex flex-col gap-2.5 mb-5 text-xs text-[#CBD5E1]">
+          <div className="flex justify-between items-start py-1 border-b border-[#0A355C]/50 gap-4">
+            <span className="text-[#94A3B8] flex items-center gap-1.5 shrink-0">
+              <MapPin className="h-3.5 w-3.5 text-[#C7F556]" /> Business Address
             </span>
-            <span className="font-semibold text-white">{lead.company}</span>
+            <span className="font-medium text-white text-right">{lead.address}</span>
           </div>
 
           <div className="flex justify-between items-center py-1 border-b border-[#0A355C]/50">
             <span className="text-[#94A3B8] flex items-center gap-1.5">
-              <UserCheck className="h-3.5 w-3.5 text-[#A855F7]" /> Referring Promoter
+              <Calendar className="h-3.5 w-3.5 text-[#A855F7]" /> Created At
             </span>
-            <span className="text-white font-medium">{lead.promoter}</span>
+            <span className="font-mono text-white">{lead.createdAt}</span>
           </div>
 
-          <div className="flex justify-between items-center py-1 border-b border-[#0A355C]/50">
+          <div className="flex flex-col gap-1 py-1">
             <span className="text-[#94A3B8] flex items-center gap-1.5">
-              <Tag className="h-3.5 w-3.5 text-[#F59E0B]" /> Acquisition Source
+              <FileText className="h-3.5 w-3.5 text-[#C7F556]" /> Admin Note
             </span>
-            <span className="text-white bg-[#0A355C]/50 px-2 py-0.5 rounded text-[11px] font-mono">
-              {lead.source}
-            </span>
+            <p className="text-white text-xs bg-[#042850] p-2.5 rounded-xl border border-[#0A355C]/70">
+              {lead.adminNote || "No admin notes added yet."}
+            </p>
           </div>
 
-          <div className="flex justify-between items-center py-1">
-            <span className="text-[#94A3B8] flex items-center gap-1.5">
-              <DollarSign className="h-3.5 w-3.5 text-[#10B981]" /> Est. Deal Value
-            </span>
-            <span className="text-[#C7F556] font-bold text-sm">{lead.value}</span>
-          </div>
+          {lead.status === "REJECTED" && lead.rejectReason && (
+            <div className="flex flex-col gap-1 py-1 border-t border-[#0A355C]/50">
+              <span className="text-[#F87171] flex items-center gap-1.5 font-semibold">
+                <AlertCircle className="h-3.5 w-3.5" /> Rejection Reason
+              </span>
+              <p className="text-[#F87171] text-xs bg-[#F87171]/10 p-2.5 rounded-xl border border-[#F87171]/30">
+                {lead.rejectReason}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Modal Actions */}
-        <div className="flex items-center justify-end gap-3">
-          {onEdit && (
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            {lead.status !== "APPROVED" && onApprove && (
+              <Button
+                type="button"
+                onClick={() => {
+                  onApprove(lead.id)
+                  onClose()
+                }}
+                className="h-9 px-4 rounded-xl text-xs font-semibold bg-[#34D399] hover:bg-[#2ebb85] text-[#00152B] cursor-pointer"
+              >
+                Approve
+              </Button>
+            )}
+
+            {lead.status !== "REJECTED" && onReject && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  onClose()
+                  onReject(lead)
+                }}
+                className="h-9 px-4 rounded-xl text-xs font-semibold border-[#F87171]/40 text-[#F87171] hover:bg-[#F87171]/15 cursor-pointer"
+              >
+                Reject
+              </Button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            {onEdit && (
+              <Button
+                type="button"
+                onClick={() => {
+                  onClose()
+                  onEdit(lead)
+                }}
+                className="h-9 px-4 rounded-xl text-xs font-semibold bg-[#C7F556] hover:bg-[#b8e645] text-[#00152B] cursor-pointer"
+              >
+                Edit
+              </Button>
+            )}
+
             <Button
               type="button"
-              onClick={() => {
-                onClose()
-                onEdit(lead)
-              }}
-              className="h-10 px-5 rounded-xl text-xs font-semibold bg-[#C7F556] hover:bg-[#b8e645] text-[#00152B] cursor-pointer"
+              variant="ghost"
+              onClick={onClose}
+              className="h-9 px-3.5 rounded-xl text-xs font-medium text-[#94A3B8] hover:text-white hover:bg-[#0A355C] cursor-pointer"
             >
-              Edit Lead
+              Close
             </Button>
-          )}
-
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={onClose}
-            className="h-10 px-4 rounded-xl text-xs font-medium text-[#94A3B8] hover:text-white hover:bg-[#0A355C] cursor-pointer"
-          >
-            Close
-          </Button>
+          </div>
         </div>
       </div>
     </div>
