@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DataTable, ColumnDef } from "@/components/common/data-table"
-import { Search } from "lucide-react"
+import { Search, MoreVertical, Eye, Pencil, Ban, CheckCircle2 } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { ConfirmModal } from "@/components/common/confirm-modal"
 import { EditBusinessModal, EditBusinessData } from "@/components/common/edit-business-modal"
 import { BusinessCampaignsModal } from "./business-campaigns-modal"
@@ -44,7 +50,7 @@ export function ListedBusinesses() {
   const [searchTerm, setSearchTerm] = useState<string>("")
 
   // Campaigns Modal state
-  const [selectedBusiness, setSelectedBusiness] = useState<{name: string, id: string} | null>(null)
+  const [selectedBusiness, setSelectedBusiness] = useState<{ name: string; id: string } | null>(null)
 
   // Edit Modal state
   const [editingBusiness, setEditingBusiness] = useState<BusinessData | null>(null)
@@ -156,45 +162,60 @@ export function ListedBusinesses() {
     {
       key: "actions",
       header: "ACTIONS",
+      className: "text-right",
       render: (row) => {
-        const isSuspended = row.status === "SUSPENDED"
         return (
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setEditingBusiness(row)}
-              className="h-7 px-3 text-xs font-medium text-[#CBD5E1] border border-[#0A355C] bg-transparent hover:bg-[#0A355C] hover:text-white rounded-lg cursor-pointer transition-colors"
-            >
-              Edit
-            </Button>
-            {isSuspended ? (
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setConfirmTarget({ row, action: "ACTIVATE" })}
-                className="h-7 px-3 text-xs font-medium text-[#34D399] border border-[#0A355C] bg-transparent hover:bg-[#0A355C] hover:text-[#34D399] rounded-lg cursor-pointer transition-colors"
+          <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="h-8 w-8 inline-flex items-center justify-center text-[#94A3B8] hover:text-white hover:bg-[#0A355C] rounded-lg transition-colors cursor-pointer outline-none">
+                <MoreVertical className="h-4 w-4" />
+                <span className="sr-only">Actions</span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="bg-[#021830] border border-[#0A355C] text-white min-w-[140px] rounded-xl p-1.5 shadow-xl z-50"
               >
-                Activate
-              </Button>
-            ) : (
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setConfirmTarget({ row, action: "SUSPEND" })}
-                className="h-7 px-3 text-xs font-medium text-[#F87171] border border-[#0A355C] bg-transparent hover:bg-[#0A355C] hover:text-[#F87171] rounded-lg cursor-pointer transition-colors"
-              >
-                Suspend
-              </Button>
-            )}
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setConfirmTarget({ row, action: "REMOVE" })}
-              className="h-7 px-3 text-xs font-medium text-[#F87171] border border-[#0A355C] bg-transparent hover:bg-[#0A355C] hover:text-[#F87171] rounded-lg cursor-pointer transition-colors"
-            >
-              Remove
-            </Button>
+                <DropdownMenuItem
+                  onClick={() => setSelectedBusiness({ name: row.name, id: row.id })}
+                  className="flex items-center gap-2 px-3 py-2 text-xs text-[#CBD5E1] hover:text-white hover:bg-[#0A355C] rounded-lg cursor-pointer outline-none transition-colors"
+                >
+                  <Eye className="h-3.5 w-3.5 text-[#C7F556]" />
+                  <span>View</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setEditingBusiness(row)}
+                  className="flex items-center gap-2 px-3 py-2 text-xs text-[#CBD5E1] hover:text-white hover:bg-[#0A355C] rounded-lg cursor-pointer outline-none transition-colors"
+                >
+                  <Pencil className="h-3.5 w-3.5 text-[#38BDF8]" />
+                  <span>Edit</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    setConfirmTarget({
+                      row,
+                      action: row.status === "ACTIVE" ? "SUSPEND" : "ACTIVATE",
+                    })
+                  }
+                  className={`flex items-center gap-2 px-3 py-2 text-xs rounded-lg cursor-pointer outline-none transition-colors ${
+                    row.status === "ACTIVE"
+                      ? "text-[#F87171] hover:text-[#F87171] hover:bg-[#F87171]/15"
+                      : "text-[#34D399] hover:text-[#34D399] hover:bg-[#34D399]/15"
+                  }`}
+                >
+                  {row.status === "ACTIVE" ? (
+                    <>
+                      <Ban className="h-3.5 w-3.5 text-[#F87171]" />
+                      <span>Suspend</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="h-3.5 w-3.5 text-[#34D399]" />
+                      <span>Activate</span>
+                    </>
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )
       },
@@ -206,37 +227,42 @@ export function ListedBusinesses() {
   return (
     <>
       <Card className="bg-[#042850] border-[#0A355C] overflow-hidden rounded-2xl">
-        <CardHeader className="flex flex-col md:flex-row md:items-center justify-between pb-4 pt-5 px-6 border-b border-[#0A355C] gap-4 md:gap-0">
-          <CardTitle className="text-sm font-semibold text-white">Listed Businesses ({filteredData.length})</CardTitle>
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <div className="flex items-center gap-1 bg-[#00152B] p-1 rounded-xl border border-[#0A355C]">
-              {tabs.map((tab) => {
-                const isActive = activeTab === tab
-                return (
-                  <Button
-                    key={tab}
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setActiveTab(tab as any)}
-                    className={`h-7 px-4 text-[11px] font-medium rounded-lg transition-colors cursor-pointer ${
-                      isActive ? "bg-[#0A355C] text-white" : "text-[#94A3B8] hover:text-white hover:bg-[#0A355C]/50"
-                    }`}
-                  >
-                    {tab}
-                  </Button>
-                )
-              })}
-            </div>
-            <div className="relative">
+        <CardHeader className="flex flex-col md:flex-row md:items-end justify-between pb-4 pt-5 px-6 border-b border-[#0A355C] gap-4">
+          {/* Left side: Title and Search input underneath */}
+          <div className="flex flex-col gap-3">
+            <CardTitle className="text-sm font-semibold text-white">
+              Listed Businesses ({filteredData.length})
+            </CardTitle>
+            <div className="relative w-full sm:w-[260px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#94A3B8]" />
               <Input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search business or category"
-                className="h-9 w-[220px] pl-9 bg-[#00152B] border-[#0A355C] text-white text-xs placeholder:text-[#94A3B8] rounded-xl focus-visible:ring-1 focus-visible:ring-[#C7F556]"
+                placeholder="Search business or category..."
+                className="h-9 w-full pl-9 bg-[#00152B] border-[#0A355C] text-white text-xs placeholder:text-[#94A3B8] rounded-xl focus-visible:ring-1 focus-visible:ring-[#C7F556]"
               />
             </div>
+          </div>
+
+          {/* Right side: Tabs */}
+          <div className="flex items-center gap-1 bg-[#00152B] p-1 rounded-xl border border-[#0A355C] self-start md:self-end">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab
+              return (
+                <Button
+                  key={tab}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setActiveTab(tab as any)}
+                  className={`h-7 px-4 text-[11px] font-medium rounded-lg transition-colors cursor-pointer ${
+                    isActive ? "bg-[#0A355C] text-white" : "text-[#94A3B8] hover:text-white hover:bg-[#0A355C]/50"
+                  }`}
+                >
+                  {tab}
+                </Button>
+              )
+            })}
           </div>
         </CardHeader>
         <CardContent className="p-0">

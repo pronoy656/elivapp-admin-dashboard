@@ -1,10 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { CreditCard, Building2, Target, BarChart2 } from "lucide-react"
+import { CreditCard, Building2, Target, BarChart2, MoreVertical, Eye, Pencil, Ban, CheckCircle2 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   ResponsiveContainer,
   AreaChart,
@@ -16,6 +22,9 @@ import {
 } from "recharts"
 import { ConfirmModal } from "@/components/common/confirm-modal"
 import { EditBusinessModal, EditBusinessData } from "@/components/common/edit-business-modal"
+import { BusinessCampaignsModal } from "@/components/dashboard/business/business-campaigns-modal"
+import { ListCard } from "@/components/dashboard/overview/list-card"
+import { RecentActivity } from "@/components/dashboard/overview/recent-activity"
 
 const chartData = [
   { name: "Jul 29", redemptions: 48, sales: 1850 },
@@ -111,6 +120,7 @@ export function BusinessOverview() {
   const [businesses, setBusinesses] = useState<BusinessItem[]>(initialBusinessData)
   
   // Modals state
+  const [viewingBusiness, setViewingBusiness] = useState<{ name: string; id: string } | null>(null)
   const [editingBusiness, setEditingBusiness] = useState<BusinessItem | null>(null)
   const [confirmTarget, setConfirmTarget] = useState<{
     row: BusinessItem
@@ -372,35 +382,56 @@ export function BusinessOverview() {
                     )}
                   </td>
                   <td className="py-4 px-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setEditingBusiness(item)}
-                        className="h-7 px-3 text-xs font-medium text-[#CBD5E1] border border-[#0A355C] bg-transparent hover:bg-[#0A355C] hover:text-white rounded-lg cursor-pointer transition-colors"
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="h-8 w-8 inline-flex items-center justify-center text-[#94A3B8] hover:text-white hover:bg-[#0A355C] rounded-lg transition-colors cursor-pointer outline-none">
+                        <MoreVertical className="h-4 w-4" />
+                        <span className="sr-only">Actions</span>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        className="bg-[#021830] border border-[#0A355C] text-white min-w-[140px] rounded-xl p-1.5 shadow-xl z-50"
                       >
-                        Edit
-                      </Button>
-                      {item.status === "ACTIVE" ? (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setConfirmTarget({ row: item, action: "SUSPEND" })}
-                          className="h-7 px-3 text-xs font-medium text-[#F87171] border border-[#0A355C] bg-transparent hover:bg-[#0A355C] hover:text-[#F87171] rounded-lg cursor-pointer transition-colors"
+                        <DropdownMenuItem
+                          onClick={() => setViewingBusiness({ name: item.name, id: item.id })}
+                          className="flex items-center gap-2 px-3 py-2 text-xs text-[#CBD5E1] hover:text-white hover:bg-[#0A355C] rounded-lg cursor-pointer outline-none transition-colors"
                         >
-                          Suspend
-                        </Button>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setConfirmTarget({ row: item, action: "ACTIVATE" })}
-                          className="h-7 px-3 text-xs font-medium text-[#34D399] border border-[#0A355C] bg-transparent hover:bg-[#0A355C] hover:text-[#34D399] rounded-lg cursor-pointer transition-colors"
+                          <Eye className="h-3.5 w-3.5 text-[#C7F556]" />
+                          <span>View</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => setEditingBusiness(item)}
+                          className="flex items-center gap-2 px-3 py-2 text-xs text-[#CBD5E1] hover:text-white hover:bg-[#0A355C] rounded-lg cursor-pointer outline-none transition-colors"
                         >
-                          Activate
-                        </Button>
-                      )}
-                    </div>
+                          <Pencil className="h-3.5 w-3.5 text-[#38BDF8]" />
+                          <span>Edit</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            setConfirmTarget({
+                              row: item,
+                              action: item.status === "ACTIVE" ? "SUSPEND" : "ACTIVATE",
+                            })
+                          }
+                          className={`flex items-center gap-2 px-3 py-2 text-xs rounded-lg cursor-pointer outline-none transition-colors ${
+                            item.status === "ACTIVE"
+                              ? "text-[#F87171] hover:text-[#F87171] hover:bg-[#F87171]/15"
+                              : "text-[#34D399] hover:text-[#34D399] hover:bg-[#34D399]/15"
+                          }`}
+                        >
+                          {item.status === "ACTIVE" ? (
+                            <>
+                              <Ban className="h-3.5 w-3.5 text-[#F87171]" />
+                              <span>Suspend</span>
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle2 className="h-3.5 w-3.5 text-[#34D399]" />
+                              <span>Activate</span>
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </td>
                 </tr>
               ))}
@@ -408,6 +439,36 @@ export function BusinessOverview() {
           </table>
         </div>
       </Card>
+
+      {/* Bottom 2 Columns: Top Businesses & Recent Activity */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <ListCard 
+          title="Top Businesses"
+          FallbackIcon={Building2}
+          items={[
+            { name: "TacoFusion", desc: "187 conversions · $20/referral", val: "$3,740", img: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=100&h=100&fit=crop&crop=faces" },
+            { name: "FitZone Gym", desc: "94 conversions · $40/referral", val: "$3,760", img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=100&h=100&fit=crop&crop=faces" },
+            { name: "Luna Spa", desc: "61 conversions · $30/referral", val: "$1,830", img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=100&h=100&fit=crop&crop=faces" },
+            { name: "Kava Brew", desc: "38 conversions · $25/referral", val: "$950", img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=100&h=100&fit=crop&crop=faces" },
+          ]}
+        />
+        <RecentActivity 
+          items={[
+            { action: "Approved Kava Brew campaign", time: "09:14" },
+            { action: "Suspended CloudCuts account", time: "08:32" },
+            { action: "New campaign registered by FitZone Gym", time: "Yesterday" },
+            { action: "TacoFusion reached 180+ conversions", time: "Yesterday" },
+            { action: "Commission updated 10% → 15%", time: "3 days ago" },
+          ]}
+        />
+      </div>
+
+      {/* View Campaigns Modal */}
+      <BusinessCampaignsModal
+        isOpen={!!viewingBusiness}
+        onClose={() => setViewingBusiness(null)}
+        business={viewingBusiness}
+      />
 
       {/* Edit Modal */}
       <EditBusinessModal

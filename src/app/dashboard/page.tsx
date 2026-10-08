@@ -2,13 +2,12 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Target, CreditCard, Link as LinkIcon, MousePointerClick, Building2, Users, QrCode } from "lucide-react"
+import { Target, Link as LinkIcon, MousePointerClick, Building2, Users, QrCode } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 // Overview Components
 import { StatCard } from "@/components/common/stat-card"
 import { ReferralActivityChart } from "@/components/dashboard/overview/referral-activity-chart"
-import { HowItWorks } from "@/components/dashboard/overview/how-it-works"
 import { ListCard } from "@/components/dashboard/overview/list-card"
 import { RecentActivity } from "@/components/dashboard/overview/recent-activity"
 import { BusinessOverview } from "@/components/dashboard/overview/business-overview"
@@ -31,7 +30,7 @@ export default function DashboardPage() {
           <div className="flex items-center bg-[#021830] border border-[#0A355C] p-1 rounded-xl">
             <button
               onClick={() => setActiveTab("promoters")}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${
                 activeTab === "promoters"
                   ? "bg-[#C7F556] text-[#00152B] font-semibold"
                   : "text-[#94A3B8] hover:text-white"
@@ -42,7 +41,7 @@ export default function DashboardPage() {
             </button>
             <button
               onClick={() => setActiveTab("businesses")}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${
                 activeTab === "businesses"
                   ? "bg-[#C7F556] text-[#00152B] font-semibold"
                   : "text-[#94A3B8] hover:text-white"
@@ -68,13 +67,7 @@ export default function DashboardPage() {
       ) : (
         <>
           {/* Stats Cards */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <StatCard 
-              title="Total Revenue Paid" 
-              value="$10,940" 
-              icon={<CreditCard className="h-5 w-5 text-[#D7FE7C]" />} 
-              trendValue="+12.4%" 
-            />
+          <div className="grid gap-4 md:grid-cols-3">
             <StatCard 
               title="Referral Links Shared" 
               value="534" 
@@ -98,21 +91,8 @@ export default function DashboardPage() {
           {/* Main Chart */}
           <ReferralActivityChart />
 
-          {/* How elivapp Works */}
-          <HowItWorks />
-
-          {/* Bottom 3 Columns */}
-          <div className="grid gap-4 md:grid-cols-3">
-            <ListCard 
-              title="Top Businesses"
-              FallbackIcon={Building2}
-              items={[
-                { name: "TacoFusion", desc: "187 conversions · $20/referral", val: "$3,740", img: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=100&h=100&fit=crop&crop=faces" },
-                { name: "FitZone Gym", desc: "94 conversions · $40/referral", val: "$3,760", img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=100&h=100&fit=crop&crop=faces" },
-                { name: "Luna Spa", desc: "61 conversions · $30/referral", val: "$1,830", img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=100&h=100&fit=crop&crop=faces" },
-                { name: "Kava Brew", desc: "38 conversions · $25/referral", val: "$950", img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=100&h=100&fit=crop&crop=faces" },
-              ]}
-            />
+          {/* Bottom 2 Columns: Top Promoters & Recent Activity */}
+          <div className="grid gap-4 md:grid-cols-2">
             <ListCard 
               title="Top Promoters"
               FallbackIcon={Users}
@@ -125,11 +105,11 @@ export default function DashboardPage() {
             />
             <RecentActivity 
               items={[
-                { action: "Approved Kava Brew campaign", time: "09:14" },
-                { action: "Suspended CloudCuts account", time: "08:32" },
                 { action: "Adjusted multiplier Tariq Osman → 0.5x", time: "Yesterday" },
                 { action: "Sent push notification to All users", time: "Yesterday" },
-                { action: "Commission updated 10% → 15%", time: "3 days ago" },
+                { action: "Alicia Monroe reached $3,000+ earnings", time: "2 days ago" },
+                { action: "Dispute resolved for Jordan Travis", time: "2 days ago" },
+                { action: "New promoter onboarded: Devon Rivera", time: "3 days ago" },
               ]}
             />
           </div>
