@@ -14,6 +14,7 @@ import {
   Users,
   Search,
   User,
+  UserPlus,
 } from "lucide-react"
 
 import {
@@ -70,6 +71,7 @@ export default function DashboardLayout({
     if (pathname.includes("/users/promoters") || pathname.includes("/promoters")) return "Users / Promoters"
     if (pathname.startsWith("/dashboard/users") || pathname.startsWith("/dashboard/user")) return "Users"
     if (pathname.startsWith("/dashboard/referrals")) return "Referrals"
+    if (pathname.startsWith("/dashboard/leads") || pathname.startsWith("/dashboard/lead-acquisition")) return "Lead Acquisition"
     if (pathname.startsWith("/dashboard/notifications")) return "Notifications"
     if (pathname.startsWith("/dashboard/settings")) return "Settings"
     if (pathname.startsWith("/dashboard/my-profile")) return "My Profile"
@@ -108,6 +110,7 @@ export default function DashboardLayout({
       ],
     },
     { name: "Referrals", href: "/dashboard/referrals", icon: QrCode },
+    { name: "Lead Acquisition", href: "/dashboard/leads", icon: UserPlus },
     { name: "Notifications", href: "/dashboard/notifications", icon: Bell },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ]

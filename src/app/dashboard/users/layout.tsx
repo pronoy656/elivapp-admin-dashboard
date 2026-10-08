@@ -33,7 +33,7 @@ export default function UsersLayout({
             {isBusiness
               ? "Manage all listed businesses on elivapp."
               : isPromoters
-              ? "Monitor promoter performance, disputes, and rewards distribution."
+              ? "Monitor promoter performance and rewards distribution."
               : "Manage businesses and promoters on elivapp."}
           </p>
         </div>
