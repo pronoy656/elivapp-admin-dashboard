@@ -5,21 +5,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Area, AreaChart, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, CartesianGrid } from "recharts"
 
-type MetricType = "referrals" | "conversions" | "revenue"
+type MetricType = "referrals" | "conversions" | "earnings"
 
 const chartData = [
-  { name: 'Feb', referrals: 400, conversions: 240, revenue: 2400 },
-  { name: 'Mar', referrals: 450, conversions: 280, revenue: 2800 },
-  { name: 'Apr', referrals: 420, conversions: 290, revenue: 2900 },
-  { name: 'May', referrals: 580, conversions: 350, revenue: 3800 },
-  { name: 'Jun', referrals: 720, conversions: 480, revenue: 5200 },
-  { name: 'Jul', referrals: 890, conversions: 610, revenue: 7800 },
+  { name: 'Feb', referrals: 400, conversions: 240, earnings: 2400 },
+  { name: 'Mar', referrals: 450, conversions: 280, earnings: 2800 },
+  { name: 'Apr', referrals: 420, conversions: 290, earnings: 2900 },
+  { name: 'May', referrals: 580, conversions: 350, earnings: 3800 },
+  { name: 'Jun', referrals: 720, conversions: 480, earnings: 5200 },
+  { name: 'Jul', referrals: 890, conversions: 610, earnings: 7800 },
 ]
 
 const metricConfig: Record<MetricType, { label: string; stroke: string; stopColor: string }> = {
   referrals: { label: "Referrals", stroke: "#D7FE7C", stopColor: "#D7FE7C" },
   conversions: { label: "Conversions", stroke: "#34D399", stopColor: "#34D399" },
-  revenue: { label: "Revenue ($)", stroke: "#A855F7", stopColor: "#A855F7" },
+  earnings: { label: "Earnings ($)", stroke: "#A855F7", stopColor: "#A855F7" },
 }
 
 export function ReferralActivityChart() {
@@ -35,7 +35,7 @@ export function ReferralActivityChart() {
           <CardDescription className="text-xs text-muted-foreground">Last 30 days breakdown</CardDescription>
         </div>
         <div className="flex items-center bg-[#00152B] p-1.5 rounded-xl border border-[#0A355C]">
-          {(["referrals", "conversions", "revenue"] as MetricType[]).map((metric) => {
+          {(["referrals", "conversions", "earnings"] as MetricType[]).map((metric) => {
             const isActive = activeMetric === metric
             return (
               <Button
@@ -76,7 +76,7 @@ export function ReferralActivityChart() {
               contentStyle={{ backgroundColor: '#00152B', borderColor: '#0A355C', borderRadius: '12px', color: '#fff' }}
               itemStyle={{ color: currentConfig.stroke }}
               formatter={(val: any) => [
-                activeMetric === "revenue" ? `$${Number(val).toLocaleString()}` : val,
+                activeMetric === "earnings" ? `$${Number(val).toLocaleString()}` : val,
                 currentConfig.label
               ]}
             />
