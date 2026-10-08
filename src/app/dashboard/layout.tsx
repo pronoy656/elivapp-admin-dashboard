@@ -45,6 +45,7 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar"
+import { DateRangeFilter, PredefinedRange, CustomDateRange } from "@/components/common/date-range-filter"
 
 export default function DashboardLayout({
   children,
@@ -52,7 +53,8 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
-  const [headerRange, setHeaderRange] = useState<"7D" | "30D" | "90D">("30D")
+  const [headerRange, setHeaderRange] = useState<PredefinedRange>("30D")
+  const [customDateRange, setCustomDateRange] = useState<CustomDateRange | undefined>(undefined)
   const [unreadNotifications, setUnreadNotifications] = useState(2)
   const [usersExpanded, setUsersExpanded] = useState(true)
 
@@ -293,25 +295,17 @@ export default function DashboardLayout({
                 />
               </div>
             </form>
-            {/* Interactive Header Range Filter Pills */}
-            <div className="hidden md:flex items-center bg-[#00152B] rounded-xl p-1 h-10 border border-[#0A355C]">
-              {(["7D", "30D", "90D"] as const).map((range) => {
-                const isActive = (headerRange || "30D") === range
-                return (
-                  <button
-                    key={range}
-                    type="button"
-                    onClick={() => setHeaderRange(range)}
-                    className={`px-3.5 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${isActive
-                      ? "bg-[#0A355C] text-white shadow-sm"
-                      : "text-muted-foreground hover:text-white"
-                      }`}
-                  >
-                    {range}
-                  </button>
-                )
-              })}
-            </div>
+            {/* Interactive Header Range Filter with Custom Calendar Filter */}
+            <DateRangeFilter
+              currentRange={headerRange}
+              customRange={customDateRange}
+              onChange={(range, customRange) => {
+                setHeaderRange(range)
+                if (customRange) {
+                  setCustomDateRange(customRange)
+                }
+              }}
+            />
 
             {/* Interactive Bell Notifications Dropdown */}
             <DropdownMenu>
